@@ -1,79 +1,53 @@
 require(['./js/config.js'], function() {
     require(['jquery', 'bscroll'], function($, bscroll) {
-        var bscroll = new bscroll('.wrap', {
-            probeType: 2,
+        var type = "女装";
+        ajax();
+        var bscroll = new bscroll('.right', {
             click: true
         })
-        ajax();
 
         function ajax() {
             $.ajax({
+                url: '/api/type',
+                dataType: "json",
+                success: function(res) {
+                    console.log(res)
+                }
+            })
+
+
+            $.ajax({
                 url: '/api/list',
+                data: {
+                    type: type
+                },
                 dataType: 'json',
                 success: function(res) {
                     // console.log(res)
                     if (res.code === 1) {
-                        render(res.data)
+                        console.log(res.data)
+                        render(res.data[0].list)
                     }
                 }
             })
         }
 
         function render(data) {
-            var obj = {};
+            var str = "";
             data.forEach(function(item) {
-                    var first = item.Spelling.substr(0, 1);
-                    if (!obj[first]) {
-                        obj[first] = {
-                            title: first,
-                            list: []
-                        }
-                    }
-                    obj[first].list.push(item);
-
-                })
-                // console.log(obj)
-            var target = [];
-            for (var i in obj) {
-                target.push(obj[i])
-            }
-
-            var str = '';
-            var html = '';
-            target.forEach(function(item) {
-                html += `<li>${item.title}</li>`;
-
-                str += `
-                    <li>
-                        <h2>${item.title}</h2>
-                        <ol>`
-                str += renderlist(item.list)
-                str += ` </ol>
-                    </li>
-                    `
+                str += ` <dl data-id="${item.id}">
+                            <dt>
+                            <img src="${item.url}" alt="">
+                        </dt>
+                            <dd>${item.title}</dd>
+                        </dl>`
             })
-            $('.uls').html(str);
-            $('.fix').html(html)
+            $('.content').html(str)
         }
 
-        function renderlist(data) {
-            return data.map(function(item) {
-                return `<li>${item.Name}</li>`
-            }).join('')
-        }
-
-        $('.fix').on('click', 'li', function() {
-            var index = $(this).index();
-
-            bscroll.scrollToElement($('.uls>li').eq(index)[0])
-
-            $('.mark p').html($(this).html())
-                // $('.mark').toggleClass('none')
-            document.querySelector('.mark').style.display = 'block';
-            setTimeout(function() {
-                document.querySelector('.mark').style.display = 'none';
-            }, 500)
-
+        $('.content').on('click', 'dl', function() {
+            var id = $(this).attr('data-id');
+            location.href = '../page/detail.html?id=' + id + '&type=' + type;
         })
 
     })

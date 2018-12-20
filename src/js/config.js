@@ -2,6 +2,7 @@ require.config({
     baseUrl: '/js/',
     paths: {
         'jquery': './jquery-2.1.1.min',
-        'bscroll': './better-scroll'
+        'bscroll': './better-scroll',
+        'parmas': './parmas'
     }
 })
